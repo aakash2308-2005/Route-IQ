@@ -1,0 +1,73 @@
+# Brings up the full Core system from a clean checkout (docs/09 M13).
+# Usage: copy .env.example to .env, then: docker compose up --build
+# Core services: postgres + redis + backend. (ml-service is optional/stretch.)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-smartcommute}
+      POSTGRES_USER: ${DB_USERNAME:-smartcommute}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-smartcommute}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-smartcommute}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: mock
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-smartcommute}
+      DB_USERNAME: ${DB_USERNAME:-smartcommute}
+      DB_PASSWORD: ${DB_PASSWORD:-smartcommute}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env (min 32 chars)}
+      # Set to "true" and start the ml-service (profile "ml") to enable ML-backed ETAs.
+      ETA_ML_ENABLED: ${ETA_ML_ENABLED:-false}
+      ETA_ML_BASE_URL: http://ml-service:8000
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # Optional (stretch). Start with: docker compose --profile ml up --build
+  ml-service:
+    build:
+      context: ./ml-service
+    profiles: ["ml"]
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://localhost:8000/health'); sys.exit(0)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  pgdata:

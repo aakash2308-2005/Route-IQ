@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: smart-commute-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:mock}
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/smartcommute}
+    username: ${DB_USERNAME:smartcommute}
+    password: ${DB_PASSWORD:smartcommute}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# Application-specific configuration (bound via @ConfigurationProperties).
+smartcommute:
+  security:
+    jwt:
+      # NEVER commit a real secret. Provided via env in real deployments; this dev default is only
+      # used locally and must be overridden. See .env.example.
+      secret: ${JWT_SECRET:dev-only-insecure-secret-change-me-0123456789abcdef}
+      expiry-seconds: ${JWT_EXPIRY_SECONDS:3600}
+  cache:
+    route-ttl-seconds: ${ROUTE_CACHE_TTL_SECONDS:90}
+  ratelimit:
+    login:
+      limit: 10
+      window-seconds: 60
+    plan:
+      limit: 60
+      window-seconds: 60
+  city:
+    id: sample-city
+  eta:
+    ml:
+      enabled: ${ETA_ML_ENABLED:false}
+      base-url: ${ETA_ML_BASE_URL:http://localhost:8000}
+      timeout-ms: 800
+
+# Resilience4j: circuit breaker around the optional ML ETA HTTP call (docs/08 section 2.6).
+resilience4j:
+  circuitbreaker:
+    instances:
+      etaMl:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        register-health-indicator: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    # Include the correlation id (populated by CorrelationIdFilter via MDC) in every log line.
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [reqId=%X{requestId:-}] %-5level %logger{36} - %msg%n"

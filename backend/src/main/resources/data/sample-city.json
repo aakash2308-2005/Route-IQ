@@ -1,0 +1,71 @@
+{
+  "_note": "SYNTHETIC sample city network. Not real transit data. Used so the system runs with no paid API keys (see docs/08-ai-ml-design.md and docs/05-database-design.md). Layered/mode-expanded graph: each physical stop has per-mode nodes connected by transfer edges.",
+  "cityId": "sample-city",
+  "datasetVersion": "1.0.0",
+  "stops": [
+    { "name": "Central",     "lat": 12.9750, "lon": 77.6050 },
+    { "name": "Park",        "lat": 12.9820, "lon": 77.5990 },
+    { "name": "Market",      "lat": 12.9680, "lon": 77.6100 },
+    { "name": "University",  "lat": 12.9900, "lon": 77.6150 },
+    { "name": "TechPark",    "lat": 12.9600, "lon": 77.6400 },
+    { "name": "Riverside",   "lat": 12.9550, "lon": 77.5900 },
+    { "name": "Airport",     "lat": 13.0100, "lon": 77.6700 },
+    { "name": "Stadium",     "lat": 12.9720, "lon": 77.6250 }
+  ],
+  "nodes": [
+    { "id": 1,  "stop": "Central",    "layer": "WALK" },
+    { "id": 2,  "stop": "Central",    "layer": "METRO" },
+    { "id": 3,  "stop": "Central",    "layer": "BUS" },
+    { "id": 10, "stop": "Park",       "layer": "WALK" },
+    { "id": 11, "stop": "Park",       "layer": "METRO" },
+    { "id": 12, "stop": "Park",       "layer": "BUS" },
+    { "id": 20, "stop": "Market",     "layer": "WALK" },
+    { "id": 21, "stop": "Market",     "layer": "BUS" },
+    { "id": 30, "stop": "University", "layer": "WALK" },
+    { "id": 31, "stop": "University", "layer": "METRO" },
+    { "id": 40, "stop": "TechPark",   "layer": "WALK" },
+    { "id": 41, "stop": "TechPark",   "layer": "BUS" },
+    { "id": 42, "stop": "TechPark",   "layer": "METRO" },
+    { "id": 50, "stop": "Riverside",  "layer": "WALK" },
+    { "id": 51, "stop": "Riverside",  "layer": "BUS" },
+    { "id": 60, "stop": "Airport",    "layer": "WALK" },
+    { "id": 61, "stop": "Airport",    "layer": "METRO" },
+    { "id": 70, "stop": "Stadium",    "layer": "WALK" },
+    { "id": 71, "stop": "Stadium",    "layer": "BUS" },
+    { "id": 72, "stop": "Stadium",    "layer": "METRO" }
+  ],
+  "_comment_transfers": "Transfer edges connect layers at the same stop. transferSeconds is the penalty; cost 0.",
+  "transfers": [
+    { "stop": "Central",    "seconds": 120 },
+    { "stop": "Park",       "seconds": 120 },
+    { "stop": "Market",     "seconds": 90  },
+    { "stop": "University", "seconds": 120 },
+    { "stop": "TechPark",   "seconds": 150 },
+    { "stop": "Riverside",  "seconds": 90  },
+    { "stop": "Airport",    "seconds": 180 },
+    { "stop": "Stadium",    "seconds": 120 }
+  ],
+  "_comment_edges": "Directed travel edges within a layer. costCents integer; reliability 0..1. Bidirectional edges are expanded automatically by the loader when 'bidirectional' is true.",
+  "edges": [
+    { "id": 1000, "from": 2,  "to": 11, "mode": "METRO", "seconds": 300,  "costCents": 2000, "meters": 2100, "reliability": 0.95, "bidirectional": true },
+    { "id": 1001, "from": 11, "to": 31, "mode": "METRO", "seconds": 360,  "costCents": 2000, "meters": 2600, "reliability": 0.94, "bidirectional": true },
+    { "id": 1002, "from": 2,  "to": 42, "mode": "METRO", "seconds": 900,  "costCents": 3500, "meters": 7800, "reliability": 0.92, "bidirectional": true },
+    { "id": 1003, "from": 42, "to": 61, "mode": "METRO", "seconds": 780,  "costCents": 4000, "meters": 6900, "reliability": 0.90, "bidirectional": true },
+    { "id": 1004, "from": 11, "to": 72, "mode": "METRO", "seconds": 420,  "costCents": 2500, "meters": 3200, "reliability": 0.93, "bidirectional": true },
+    { "id": 1005, "from": 72, "to": 42, "mode": "METRO", "seconds": 540,  "costCents": 3000, "meters": 4600, "reliability": 0.91, "bidirectional": true },
+
+    { "id": 2000, "from": 3,  "to": 21, "mode": "BUS",   "seconds": 480,  "costCents": 1200, "meters": 2400, "reliability": 0.82, "bidirectional": true },
+    { "id": 2001, "from": 3,  "to": 12, "mode": "BUS",   "seconds": 420,  "costCents": 1200, "meters": 2000, "reliability": 0.84, "bidirectional": true },
+    { "id": 2002, "from": 21, "to": 51, "mode": "BUS",   "seconds": 600,  "costCents": 1500, "meters": 3100, "reliability": 0.80, "bidirectional": true },
+    { "id": 2003, "from": 12, "to": 71, "mode": "BUS",   "seconds": 540,  "costCents": 1400, "meters": 2900, "reliability": 0.81, "bidirectional": true },
+    { "id": 2004, "from": 71, "to": 41, "mode": "BUS",   "seconds": 720,  "costCents": 1800, "meters": 4200, "reliability": 0.78, "bidirectional": true },
+    { "id": 2005, "from": 51, "to": 41, "mode": "BUS",   "seconds": 900,  "costCents": 2000, "meters": 5200, "reliability": 0.76, "bidirectional": true },
+
+    { "id": 3000, "from": 1,  "to": 10, "mode": "WALK",  "seconds": 900,  "costCents": 0,    "meters": 900,  "reliability": 0.99, "bidirectional": true },
+    { "id": 3001, "from": 1,  "to": 20, "mode": "WALK",  "seconds": 780,  "costCents": 0,    "meters": 780,  "reliability": 0.99, "bidirectional": true },
+    { "id": 3002, "from": 10, "to": 70, "mode": "WALK",  "seconds": 650,  "costCents": 0,    "meters": 650,  "reliability": 0.99, "bidirectional": true },
+    { "id": 3003, "from": 30, "to": 31, "mode": "WALK",  "seconds": 120,  "costCents": 0,    "meters": 120,  "reliability": 0.99, "bidirectional": true },
+    { "id": 3004, "from": 40, "to": 41, "mode": "WALK",  "seconds": 150,  "costCents": 0,    "meters": 150,  "reliability": 0.99, "bidirectional": true },
+    { "id": 3005, "from": 50, "to": 51, "mode": "WALK",  "seconds": 130,  "costCents": 0,    "meters": 130,  "reliability": 0.99, "bidirectional": true }
+  ]
+}

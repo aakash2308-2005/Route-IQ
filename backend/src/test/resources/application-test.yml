@@ -1,0 +1,17 @@
+# Test profile. Uses the "mock" providers plus test containers for Postgres/Redis where needed.
+# The datasource/redis properties are overridden by @DynamicPropertySource in integration tests.
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+smartcommute:
+  security:
+    jwt:
+      secret: test-only-secret-0123456789abcdef0123456789abcdef
+      expiry-seconds: 3600
+  eta:
+    ml:
+      enabled: false

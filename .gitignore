@@ -1,0 +1,40 @@
+# Secrets / env
+.env
+*.env
+!.env.example
+
+docs/
+
+# Java / Maven
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties.bak
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python (ml-service, stretch)
+__pycache__/
+*.pyc
+.venv/
+venv/
+ml-service/models/*.pkl
+
+# Node (frontend, stretch)
+node_modules/
+dist/
+.next/
